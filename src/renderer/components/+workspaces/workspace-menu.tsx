@@ -2,7 +2,6 @@ import "./workspace-menu.scss";
 import React from "react";
 import { observer } from "mobx-react";
 import { Link } from "react-router-dom";
-import { workspacesURL } from "./workspaces.route";
 import { Menu, MenuItem, MenuProps } from "../menu";
 import { Icon } from "../icon";
 import { observable } from "mobx";
@@ -44,8 +43,8 @@ export class WorkspaceMenu extends React.Component<Props> {
         open={() => this.menuVisible = true}
         close={() => this.menuVisible = false}
       >
-        <Link className="workspaces-title" to={workspacesURL()}>
-          Workspaces
+        <Link className="workspaces-title" to={landingURL()}>
+          Workspace Overview
         </Link>
         {enabledWorkspacesList.map(({ id: workspaceId, name, description }) => {
           return (
