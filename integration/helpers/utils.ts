@@ -10,7 +10,7 @@ interface AppTestingPaths {
   libraryPath: string,
 }
 
-function getAppTestingPaths(): AppTestingPaths {
+export function getAppTestingPaths(): AppTestingPaths {
   switch (process.platform) {
     case "win32":
       return {
@@ -109,6 +109,8 @@ async function* splitLogs(app: Application): AsyncGenerator<LogLines, void, void
   for(;;) { // infinite loop
     const curLogs: string[] = (app as any).chromeDriver.getLogs();
     const newLogs = curLogs.slice(lastLogLineCount);
+
+    console.log(curLogs);
 
     lastLogLineCount = curLogs.length;
 

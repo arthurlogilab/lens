@@ -10,7 +10,9 @@ import { spawnSync } from "child_process";
 import { listHelmRepositories } from "../helpers/utils";
 import { fail } from "assert";
 import open from "open";
-
+import path from "path";
+import { writeFile } from "fs-extra";
+import os from "os";
 
 jest.setTimeout(60000);
 
@@ -19,6 +21,7 @@ describe("Lens integration tests", () => {
   const TEST_NAMESPACE = "integration-tests";
   const BACKSPACE = "\uE003";
   let app: Application;
+
   const appStart = async () => {
     app = new Application(utils.setup());
     await app.start();
@@ -26,7 +29,28 @@ describe("Lens integration tests", () => {
     while (await app.client.getWindowCount() > 1);
     await app.client.windowByIndex(0);
     await app.client.waitUntilWindowLoaded();
+
+    if (process.platform === "linux") {
+      const testingDesktop = [
+        "[Desktop Entry]",
+	"Name=Lens",
+	`Exec=${path.resolve(utils.getAppTestingPaths().testingPath)} %U`,
+	"Terminal=false",
+	"Type=Application",
+        "Icon=lens",
+        "StartupWMClass=Lens",
+        "Comment=Lens - The Kubernetes IDE",
+        "MimeType=x-scheme-handler/lens;",
+        "Categories=Network;"
+      ].join("\n");
+
+      await writeFile(path.join(os.homedir(), ".local/share/applications/lens-testing.desktop"), testingDesktop);
+      
+      const { status } = spawnSync("xdg-settings set default-url-scheme-handler lens lens-testing.desktop", { shell: true });
+      expect(status).toBe(0);
+    }
   };
+  
   const clickWhatsNew = async (app: Application) => {
     await app.client.waitUntilTextExists("h1", "What's new?");
     await app.client.click("button.primary");
@@ -88,9 +112,10 @@ describe("Lens integration tests", () => {
       await app.client.waitUntilTextExists("h2", "Add Cluster");
     });
 
-    describe("protocol app start", () => {
+    describe.only("protocol app start", () => {
       it("should handle opening lens:// links", async () => {
-        await open("lens://app/foobar");
+        const res = await open("lens://app/foobar");
+	console.log(res);
 
         await utils.waitForLogsToContain(app, {
           main: ["No handler", "lens://app/foobar"],
