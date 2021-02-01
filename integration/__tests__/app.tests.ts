@@ -33,10 +33,10 @@ describe("Lens integration tests", () => {
     if (process.platform === "linux") {
       const testingDesktop = [
         "[Desktop Entry]",
-	"Name=Lens",
-	`Exec=${path.resolve(utils.getAppTestingPaths().testingPath)} %U`,
-	"Terminal=false",
-	"Type=Application",
+        "Name=Lens",
+        `Exec=${path.resolve(utils.getAppTestingPaths().testingPath)} %U`,
+        "Terminal=false",
+        "Type=Application",
         "Icon=lens",
         "StartupWMClass=Lens",
         "Comment=Lens - The Kubernetes IDE",
@@ -47,6 +47,7 @@ describe("Lens integration tests", () => {
       await writeFile(path.join(os.homedir(), ".local/share/applications/lens-testing.desktop"), testingDesktop);
       
       const { status } = spawnSync("xdg-settings set default-url-scheme-handler lens lens-testing.desktop", { shell: true });
+
       expect(status).toBe(0);
     }
   };
@@ -112,10 +113,11 @@ describe("Lens integration tests", () => {
       await app.client.waitUntilTextExists("h2", "Add Cluster");
     });
 
-    describe.only("protocol app start", () => {
+    describe("protocol app start", () => {
       it("should handle opening lens:// links", async () => {
         const res = await open("lens://app/foobar");
-	console.log(res);
+
+        console.log(res);
 
         await utils.waitForLogsToContain(app, {
           main: ["No handler", "lens://app/foobar"],
